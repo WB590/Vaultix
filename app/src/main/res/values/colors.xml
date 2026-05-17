@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary color (Dark Blue) - #0A3161 -->
+    <color name="vaultix_primary">#0A3161</color>
+
+    <!-- Accent color (Cyan / Light Blue) - #34E1FF -->
+    <color name="vaultix_accent">#34E1FF</color>
+
+    <!-- Secondary color (Medium Blue) - #2465A5 -->
+    <color name="vaultix_secondary">#2465A5</color>
+
+    <!-- Light text color (Very Light Blue / Almost White) - #D6E3F0 -->
+    <color name="vaultix_text_light">#D6E3F0</color>
+
+    <!-- Shadow color (Very Dark Blue) - #051A33 -->
+    <color name="vaultix_shadow">#051A33</color>
+
+    <!-- Dark background color (Very Dark Blue) - #051A33 -->
+    <color name="vaultix_dark">#051A33</color>
+
+    <!-- Surface color (Dark Blue, same as primary) - #0A3161 -->
+    <color name="vaultix_surface">#0A3161</color>
+</resources>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "854676687946",
+    "firebase_url": "https://vaultix-dbb3f-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "vaultix-dbb3f",
+    "storage_bucket": "vaultix-dbb3f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854676687946:android:7ae43292924f76b468aab3",
+        "android_client_info": {
+          "package_name": "com.example.vaultix"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854676687946-rc66b7mj3tkmk3jm0fk5gp54pkl37klq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.vaultix",
+            "certificate_hash": "d1758f79a913be08b958142bd8effcda2754e613"
+          }
+        },
+        {
+          "client_id": "854676687946-bbnidluf7gj9hvoj98msuae0a79fo2lb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIv0Y0kycr57bvyzusQPAzG0h1fefSpwg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854676687946-bbnidluf7gj9hvoj98msuae0a79fo2lb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
