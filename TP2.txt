@@ -1,0 +1,123 @@
+TP2 — Compte rendu (Vaultix)
+
+Sujet 1 : Création de liaison avec la base de données pour sauvegarder les utilisateurs
+
+1) Objectif
+- Mettre en place une authentification utilisateur et persister les données utilisateur dans Firebase.
+- Garantir qu’un utilisateur connecté possède ses données personnelles isolées (par UID).
+
+2) Technologies utilisées
+- Firebase Authentication (email/mot de passe + Google)
+- Cloud Firestore (collection users, sous-collection passwords)
+- Kotlin (Android)
+
+3) Architecture de la liaison DB
+- Authentification: Firebase Auth crée/connecte un utilisateur.
+- Après connexion: récupération du UID (`currentUser()?.uid`).
+- Firestore: stockage sous `users/{uid}` + `users/{uid}/passwords/{doc}`.
+
+[Image 1: Schéma Auth -> UID -> Firestore]
+[Image 2: Capture Firebase Console / Authentication / Users]
+[Image 3: Capture Firebase Console / Firestore / users/{uid}]
+
+4) Étapes techniques réalisées
+- Ajout dépendances Firebase dans Gradle.
+- Ajout `google-services.json` dans le module `app/`.
+- Activation Email/Password et Google dans Firebase Console.
+- Implémentation des appels Auth + Firestore dans `FirebaseRepository`.
+
+5) Extraits de code à montrer
+
+Extrait A — Connexion email/mot de passe
+(Depuis `app/src/main/java/com/example/vaultix/data/FirebaseRepository.kt`)
+
+```kotlin
+suspend fun login(email: String, password: String) {
+    suspendCancellableCoroutine { continuation ->
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener { continuation.resume(Unit) }
+            .addOnFailureListener { continuation.resumeWithException(it) }
+    }
+}
+```
+
+Extrait B — Création de compte
+
+```kotlin
+suspend fun register(email: String, password: String) {
+    suspendCancellableCoroutine { continuation ->
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener { continuation.resume(Unit) }
+            .addOnFailureListener { continuation.resumeWithException(it) }
+    }
+}
+```
+
+Extrait C — Sauvegarde des mots de passe chiffrés par utilisateur
+
+```kotlin
+suspend fun addPassword(site: String, encryptedPassword: String, iv: String) {
+    val uid = currentUser()?.uid ?: error("Utilisateur non connecté")
+    val payload = mapOf("site" to site, "password" to encryptedPassword, "iv" to iv)
+    firestore.collection("users")
+        .document(uid)
+        .collection("passwords")
+        .add(payload)
+        .await()
+}
+```
+
+6) Sécurité appliquée (point à dire à l’oral)
+- Les mots de passe ne sont jamais stockés en clair.
+- Utilisation de AES-GCM + PBKDF2.
+- Chaque utilisateur a son salt propre.
+- Validation d’un master password unique par utilisateur via un verifier chiffré.
+
+7) Résultats
+- Compte créé dans Firebase Auth.
+- Données utilisateur présentes dans Firestore.
+- Isolation des données par UID.
+
+8) Difficultés rencontrées + correction
+- Erreur `CONFIGURATION_NOT_FOUND` -> Auth non initialisée côté Firebase.
+- Erreur `PERMISSION_DENIED` -> règles Firestore non adaptées.
+- Problème Google Sign-In -> SHA-1 + `google-services.json` + Web client ID.
+
+9) Conclusion TP2
+- La liaison mobile-Firebase est fonctionnelle.
+- Le flux Auth + persistance DB est stable.
+- La base est prête pour des fonctionnalités avancées.
+
+------------------------------------------------------------
+
+Sujet 2 : Travail par binôme (distribution de tâches)
+
+1) Organisation proposée
+- Binôme A (Backend/Sécurité): Firebase, Firestore, chiffrement, règles.
+- Binôme B (Frontend/UX): écrans, navigation, drawer, validation UI.
+
+2) Exemple concret de répartition
+- Personne 1:
+  - Config Firebase (Auth, Firestore, SHA)
+  - `FirebaseRepository.kt`
+  - `PasswordCrypto.kt`
+  - règles Firestore
+- Personne 2:
+  - `MainActivity.kt` (navigation + drawer)
+  - Fragments (`Login`, `Master`, `Home`, `Add`)
+  - Layout XML et palette graphique
+
+3) Méthode de collaboration
+- Branches Git séparées par feature.
+- Pull Request + revue croisée.
+- Convention de nommage commune.
+- Daily check court (10 min): blocages + objectifs.
+
+4) Livrables binôme à montrer
+[Image 4: Tableau de tâches (qui fait quoi)]
+[Image 5: Historique commits/branches]
+
+5) Conclusion binôme
+- Répartition claire = développement plus rapide.
+- Moins de conflits techniques.
+- Meilleure qualité finale (relectures croisées).

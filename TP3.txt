@@ -1,0 +1,130 @@
+TP3 — Compte rendu (Vaultix)
+
+Sujet 1 : Page d'accueil selon l'idée du mini-projet
+
+1) Objectif de la page d’accueil
+- Donner une première impression claire du projet Vaultix.
+- Expliquer visuellement le concept: sécurité + simplicité.
+- Orienter rapidement vers les actions principales (Se connecter / S’inscrire).
+
+2) Ce que la page doit contenir
+- Logo/banner + nom de l’app (Vaultix)
+- Slogan court (ex: Secure Your Digital Life)
+- Boutons principaux:
+  - Se connecter
+  - Créer un compte
+  - (optionnel) Continuer avec Google
+
+[Image 1: Maquette écran accueil]
+[Image 2: Capture écran accueil implémenté]
+
+3) Justification UX
+- L’utilisateur comprend immédiatement le but de l’application.
+- Réduction de friction avant l’authentification.
+- Cohérence visuelle avec le reste (palette bleue).
+
+4) Proposition d’implémentation (si ajoutée)
+- Créer `WelcomeFragment` (ou `Splash/LoadingActivity`).
+- Afficher 1-2 secondes max puis redirection.
+- Si utilisateur déjà connecté -> Master Password.
+- Sinon -> Login.
+
+Pseudo-flux:
+- App start
+- Show Welcome/Loading
+- Check `FirebaseRepository.currentUser()`
+- Navigate to Login or Master
+
+------------------------------------------------------------
+
+Sujet 2 : Navigation interface accueil vers login (ou inverse)
+
+1) Navigation actuelle (dans le projet)
+- `MainActivity` décide déjà:
+  - pas de user connecté -> `LoginFragment`
+  - user connecté -> `MasterPasswordFragment`
+
+Extrait de code à présenter
+(`app/src/main/java/com/example/vaultix/MainActivity.kt`)
+
+```kotlin
+if (savedInstanceState == null) {
+    if (FirebaseRepository.currentUser() == null) {
+        openLoginScreen()
+    } else {
+        openMasterScreen()
+    }
+}
+```
+
+2) Navigation après ajout d’une page d’accueil
+- Accueil -> Login (si non connecté)
+- Accueil -> Master (si connecté)
+- Login réussi -> Master
+- Master validé -> Home
+
+[Image 3: Diagramme de navigation]
+[Image 4: Capture transitions écran]
+
+3) Gestion du bouton retour
+- Retour depuis Master/Home peut ramener au Login (logique sécurité déjà appliquée).
+- Drawer activé uniquement sur Home.
+
+------------------------------------------------------------
+
+Sujet 3 : Peut-on ajouter une page d'accueil / Loading ?
+
+Réponse: Oui, totalement.
+
+Option A (simple): `WelcomeFragment`
+- Avantage: reste dans la même architecture à fragments.
+- Coût faible.
+
+Option B (classique): `SplashActivity`
+- Avantage: écran de démarrage séparé.
+- Un peu plus de configuration AndroidManifest.
+
+Recommandation pour ton projet actuel
+- Prendre Option A (`WelcomeFragment`) pour rester cohérent avec ton architecture actuelle.
+
+------------------------------------------------------------
+
+Plan oral TP3 (prêt à présenter)
+
+1) Besoin fonctionnel
+- Pourquoi une page d’accueil ?
+- Quel problème UX elle résout ?
+
+2) Conception UI
+- Éléments choisis (logo, slogan, CTA)
+- Cohérence visuelle avec la charte
+
+3) Logique de navigation
+- Conditions de redirection (auth connecté/non connecté)
+- Liaison avec fragments existants
+
+4) Résultat et tests
+- Cas 1: nouvel utilisateur -> Login
+- Cas 2: utilisateur connecté -> Master
+- Cas 3: retour arrière -> comportement attendu
+
+5) Conclusion
+- Navigation plus claire.
+- Meilleure première expérience utilisateur.
+
+------------------------------------------------------------
+
+Annexe code (exemple de redirection dans un écran de loading)
+
+```kotlin
+viewLifecycleOwner.lifecycleScope.launch {
+    delay(1200)
+    if (FirebaseRepository.currentUser() == null) {
+        (activity as? MainActivity)?.openLoginScreenFromWelcome()
+    } else {
+        (activity as? MainActivity)?.openMasterScreenFromWelcome()
+    }
+}
+```
+
+Note: Les méthodes ci-dessus sont des exemples d’API à exposer dans `MainActivity` si tu ajoutes réellement ce fragment.

@@ -1,0 +1,20 @@
+%% Vaultix Use-Case Diagram
+flowchart LR
+    U[User]
+    A[Vaultix Android App]
+    F[(Firebase Auth)]
+    S[(Firestore)]
+
+    U -->|Email/Password Login| A
+    U -->|Google Login| A
+    U -->|Enter Master Password| A
+    U -->|View Password List| A
+    U -->|Add Password Entry| A
+    U -->|Open Drawer| A
+    U -->|Logout| A
+
+    A -->|Authenticate user| F
+    A -->|Get/Create user salt| S
+    A -->|Read encrypted passwords| S
+    A -->|Write encrypted password + IV| S
+    A -->|Store verifier cipher/iv| S

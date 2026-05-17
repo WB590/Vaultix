@@ -1,0 +1,57 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant App as Vaultix App
+    participant Auth as Firebase Auth
+    participant DB as Firestore
+    participant Crypto as PasswordCrypto
+
+    User->>App: Open app
+    alt User not authenticated
+        App->>User: Show Login screen
+        User->>App: Login (Email/Password or Google)
+        App->>Auth: signIn request
+        Auth-->>App: Auth success + UID
+    else User authenticated
+        App->>User: Show Master Password screen
+    end
+
+    User->>App: Enter Master Password + Unlock
+    App->>DB: Read users/{uid} (salt + verifier)
+    DB-->>App: user security config
+    App->>Crypto: deriveMasterKey(masterPassword, salt)
+
+    alt First unlock (no verifier yet)
+        App->>Crypto: encrypt(MASTER_VERIFIER_PLAINTEXT, key)
+        Crypto-->>App: verifierCipher + verifierIv
+        App->>DB: Save verifier fields
+        DB-->>App: Saved
+    else Returning user
+        App->>Crypto: decrypt(verifierCipher, verifierIv, key)
+        alt Wrong master password
+            Crypto-->>App: Decrypt error / mismatch
+            App-->>User: Show "Master password incorrect"
+        else Correct master password
+            Crypto-->>App: MASTER_VERIFIER_PLAINTEXT
+            App->>User: Open Home screen
+        end
+    end
+
+    User->>App: Add password(site, plainPassword)
+    App->>Crypto: encrypt(plainPassword, key)
+    Crypto-->>App: cipherText + iv
+    App->>DB: Write users/{uid}/passwords/{doc}
+    DB-->>App: Write success
+
+    User->>App: Open Home
+    App->>DB: Read encrypted passwords
+    DB-->>App: List of encrypted entries
+    loop For each entry
+        App->>Crypto: decrypt(cipherText, iv, key)
+        Crypto-->>App: plainPassword
+    end
+    App-->>User: Render password list
+
+    User->>App: Logout
+    App->>Auth: signOut()
+    App-->>User: Return to Login + clear session key
